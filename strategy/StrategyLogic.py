@@ -19,6 +19,7 @@ class BaseStrategy(ABC):
             -1  →  SELL / SHORT
              0  →  No action
     """
+    
 
     name: str = "BaseStrategy"
 
