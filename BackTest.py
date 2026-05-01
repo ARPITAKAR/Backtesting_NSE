@@ -41,7 +41,7 @@ class BackTest:
         self.symbol   = TradingSymbol(asset_name, quantity, noise_below)
         self.strategy = (get_strategy(strategy)
                          if isinstance(strategy, str) else strategy)
-        self.csv_path = csv_path or f"data/{asset_name}.csv"
+        self.csv_path = csv_path or f"C:/Users/Arpit/Desktop/Backtesting/data/{asset_name}.csv"
         self.capital  = capital
 
         self._fd      : FinancialData | None = None
@@ -137,10 +137,16 @@ class BackTest:
         return self._fd.to_dataframe()
 
     # ── private ───────────────────────────────────────────────
+    # 1: private method
     def _load_and_prepare(self) -> pd.DataFrame:
+        # 2: load data
         loader = DataLoader(self.csv_path)
         df     = loader.load()
+        # 3: add indicators
         df     = IndicatorMetrics(df).compute_all()
+        # 4: generate trading signals
         df     = self.strategy.generate_signals(df)
+        # 5: drop rows without signals
         df     = df.dropna(subset=["signal"])
+        # 6: return final dataframe
         return df

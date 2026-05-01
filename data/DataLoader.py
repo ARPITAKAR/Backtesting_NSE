@@ -64,7 +64,7 @@ class DataLoader:
     def _parse_dates(self, df: pd.DataFrame) -> pd.DataFrame:
         if COL_DATE in df.columns:
             try:
-                df[COL_DATE] = pd.to_datetime(df[COL_DATE])
+                df[COL_DATE] = pd.to_datetime(df[COL_DATE],format=DATE_FORMAT)
                 df = df.set_index(COL_DATE).sort_index()
             except Exception as e:
                 print_warn(f"Could not parse Date column: {e}")

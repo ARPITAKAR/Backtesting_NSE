@@ -34,4 +34,4 @@ MIN_BARS_BETWEEN    = 3        # Minimum bars between two entries
 
 # ---------- Output ----------
 OUTPUT_DIR          = "output"
-DATE_FORMAT         = "%Y-%m-%d"
+DATE_FORMAT         = "%d-%b-%y"

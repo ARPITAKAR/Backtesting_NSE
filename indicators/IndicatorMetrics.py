@@ -103,7 +103,7 @@ class TimeCheck:
         """Call every bar to refresh IsAllowed."""
         self.IsAllowed = (
             bar_index >= self.NextEntrySignal
-            and open_trades < self.TotalOpenTradesAtATime
+            and open_trades <= self.TotalOpenTradesAtATime
         )
 
 
