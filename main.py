@@ -16,7 +16,7 @@ if __name__ == '__main__':
     #      csv_path    = "",           # leave blank → auto: data/RELIANCE.csv
     #      capital     = 100_000,      # starting capital ₹
     #      quantity    = 1,            # shares per trade
-    #      noise_below = 1100.0,       # ignore signals below this price
+    #      noise_below = 1400.0,       # ignore signals below this price
     #  )
     # ─────────────────────────────────────────────────────────
 

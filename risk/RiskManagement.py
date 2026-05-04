@@ -124,7 +124,7 @@ class TradingSymbol:
     def __init__(self,
                  asset: str             = "RELIANCE",
                  quantity: int          = 1,
-                 noise_price_below: float = 1100.0):
+                 noise_price_below: float = 1400.0):
         self.Asset            = asset
         self.Quantity         = quantity
         self.NoisePriceBelow  = noise_price_below

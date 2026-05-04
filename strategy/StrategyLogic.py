@@ -138,6 +138,101 @@ class BollingerBandStrategy(BaseStrategy):
         return df
 
 
+# ============================================================
+#  Class: SMA13BandStrategy
+# ============================================================
+
+class SMA13BandStrategy(BaseStrategy):
+
+    name = "13 EMA Band Breakout"
+
+    # ========================================================
+    # FUNCTION: generate_signals
+    # ========================================================
+    def generate_signals(self, df: pd.DataFrame) -> pd.DataFrame:
+
+        # ----------------------------------------------------
+        # 1. COPY
+        # ----------------------------------------------------
+        df = df.copy()
+
+        # ----------------------------------------------------
+        # 2. INDICATORS
+        # ----------------------------------------------------
+        df["SMA_5"] = df["Close"].rolling(5).mean()
+
+        df["EMA13_high"] = df["High"].ewm(span=13, adjust=False).mean()
+        df["EMA13_low"]  = df["Low"].ewm(span=13, adjust=False).mean()
+
+        # ----------------------------------------------------
+        # 3. INIT
+        # ----------------------------------------------------
+        df["signal"] = 0
+
+        signal_bar_high = None
+        signal_bar_low  = None
+
+        active_long  = False
+        active_short = False
+
+        # ----------------------------------------------------
+        # 4. LOOP
+        # ----------------------------------------------------
+        for i in range(1, len(df)):
+
+            prev = df.iloc[i - 1]
+            curr = df.iloc[i]
+
+            sma5  = curr["SMA_5"]
+            upper = curr["EMA13_high"]
+            lower = curr["EMA13_low"]
+
+            # =================================================
+            # 4.1 CONSOLIDATION FILTER (RESET)
+            # =================================================
+            if lower < sma5 < upper:
+                active_long = False
+                active_short = False
+                signal_bar_high = None
+                signal_bar_low  = None
+                continue
+
+            # =================================================
+            # 4.2 LONG SETUP
+            # =================================================
+            if not active_long and not active_short:
+                if (prev["SMA_5"] <= prev["EMA13_high"]) and (curr["SMA_5"] > curr["EMA13_high"]):
+                    signal_bar_high = curr["High"]
+                    active_long = True
+                    continue
+
+                if (prev["SMA_5"] >= prev["EMA13_low"]) and (curr["SMA_5"] < curr["EMA13_low"]):
+                    signal_bar_low = curr["Low"]
+                    active_short = True
+                    continue
+
+            # =================================================
+            # 4.3 LONG ENTRY
+            # =================================================
+            if active_long and signal_bar_high is not None:
+                if curr["Close"] > signal_bar_high:
+                    df.iloc[i, df.columns.get_loc("signal")] = 1
+                    active_long = False
+                    signal_bar_high = None
+                    continue
+
+            # =================================================
+            # 4.4 SHORT ENTRY
+            # =================================================
+            if active_short and signal_bar_low is not None:
+                if curr["Close"] < signal_bar_low:
+                    df.iloc[i, df.columns.get_loc("signal")] = -1
+                    active_short = False
+                    signal_bar_low = None
+                    continue
+
+        return df               
+                
 # ─────────────────────────────────────────────────────────────
 # Registry – add new strategies here for easy lookup
 STRATEGY_REGISTRY: dict[str, type[BaseStrategy]] = {
@@ -146,6 +241,7 @@ STRATEGY_REGISTRY: dict[str, type[BaseStrategy]] = {
     "macd"      : MACDStrategy,
     "rsi"       : RSIStrategy,
     "bollinger" : BollingerBandStrategy,
+    "sma13_band" : SMA13BandStrategy
 }
 
 

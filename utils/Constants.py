@@ -4,7 +4,7 @@
 
 # ---------- Capital & Brokerage ----------
 INITIAL_CAPITAL      = 100_000      # Starting capital in ₹
-BROKERAGE_PER_TRADE  = 20           # Flat ₹20 per executed order (Zerodha style)
+
 LOT_SIZE             = 1            # Default lot / quantity multiplier
 
 # ---------- CSV Column Names (change to match your file) ----------

@@ -6,7 +6,7 @@ import csv
 import pandas as pd
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
-from utils.Constants import BROKERAGE_PER_TRADE, OUTPUT_DIR
+from utils.Constants import  OUTPUT_DIR
 from utils.Display import print_info
 
 
@@ -60,7 +60,7 @@ class FinancialData:
             entry_date  = str(entry_date),
             entry_price = entry_price,
             quantity    = quantity,
-            brokerage   = BROKERAGE_PER_TRADE,
+            brokerage   = 0.0,
         )
         self._trades.append(t)
         return t
@@ -70,7 +70,12 @@ class FinancialData:
         trade.exit_date   = str(exit_date)
         trade.exit_price  = exit_price
         trade.exit_reason = reason
-        trade.brokerage  += BROKERAGE_PER_TRADE   # exit leg
+        BROKERAGE_PER_TRADE= self._calculate_charges(
+            trade.entry_price,
+            exit_price,
+            trade.quantity
+        )
+        trade.brokerage  = BROKERAGE_PER_TRADE   # exit leg
 
         if trade.direction == "BUY":
             trade.pnl = (exit_price - trade.entry_price) * trade.quantity
@@ -188,3 +193,28 @@ class FinancialData:
             "net_pnl","total_brokerage","actual_return",
             "win_streak","loss_streak","max_drawdown","max_gain","max_loss",
         ]} | {"open_trades": len(open_trades), "closed_trades": 0}
+
+
+    def _calculate_charges(self,entry_price,exit_price,qty):
+        
+        buy_value= entry_price * qty
+        sell_value= exit_price * qty
+        turnover= buy_value + sell_value
+        
+        # STT (Delivery)
+        stt= 0.001 * buy_value + 0.001 * sell_value
+        
+        # Exchange txn charge
+        exch= 0.000345 * turnover
+        
+        # GST (18% on transaction)
+        GST= 0.18 * exch
+        
+        # SEBI Charge
+        sebi= turnover * 0.000001
+        
+        # Stamp duty (Only on Buy)
+        stamp= 0.00015 * buy_value
+        
+        total= stt + exch + GST + sebi + stamp
+        return total

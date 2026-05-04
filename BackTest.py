@@ -31,7 +31,7 @@ class BackTest:
     """
 
     def __init__(self,
-                 asset_name : str                = "RELIANCE",
+                 asset_name : str                = "ULTRACEMCO",
                  strategy                        = "sma",
                  csv_path   : str                = "",
                  capital    : float              = INITIAL_CAPITAL,
